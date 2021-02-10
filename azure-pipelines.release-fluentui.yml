@@ -146,10 +146,21 @@ jobs:
 
       - task: CmdLine@2
         displayName: 'Set base path and version'
-        condition: and(succeeded(), eq(variables.publishOfficial, true))
+        condition: and(succeeded(), eq(variables.publishOfficial, true), ne(variables.version, 'canary'))
         inputs:
           script: |
             ver=`node -p "require('./packages/fluentui/react-northstar/package.json').version"`
+            echo "Docsite base path published for version $ver"
+            echo "##vso[task.setvariable variable=deployBasePath]$ver"
+            echo "##vso[task.setvariable variable=docsiteVersion]$ver"
+            echo "##vso[task.setvariable variable=nightlyRelease]"
+
+      - task: CmdLine@2
+        displayName: 'Set base path and version for canary'
+        condition: and(succeeded(), eq(variables.publishOfficial, true), eq(variables.version, 'canary'))
+        inputs:
+          script: |
+            ver=`node -p "require('./packages/fluentui/lerna.json').version"`
             echo "Docsite base path published for version $ver"
             echo "##vso[task.setvariable variable=deployBasePath]$ver"
             echo "##vso[task.setvariable variable=docsiteVersion]$ver"
