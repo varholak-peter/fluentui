@@ -113,17 +113,13 @@ jobs:
           script: |
             yarn logout
 
-            export NPM_TOKEN=$(npmToken)
-
-            echo "@fluentui:registry=http://registry.npmjs.org/" > .npmrc
-            echo "registry=http://registry.npmjs.org/" >> .npmrc
-            echo //registry.npmjs.org/:_authToken=$(npmToken) >> .npmrc
+            NPM_TOKEN=$(npmToken)
 
             touch packages/fluentui/.npmrc
 
             echo "@fluentui:registry=http://registry.npmjs.org/" > packages/fluentui/.npmrc
             echo "registry=http://registry.npmjs.org/" >> packages/fluentui/.npmrc
-            echo //registry.npmjs.org/:_authToken=$(npmToken) >> packages/fluentui/.npmrc
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> packages/fluentui/.npmrc
 
             yarn release:fluentui:$(version) --yes
 

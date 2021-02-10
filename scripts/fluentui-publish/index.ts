@@ -33,7 +33,6 @@ export function fluentuiLernaPublish(bumpType, skipConfirm = false, npmTagForCan
         'publish',
         'prerelease',
         "--tag-version-prefix='@fluentui/react-northstar_v'",
-        '--no-push',
         '--no-git-tag-version',
         '--no-git-reset',
         '--force-publish',
