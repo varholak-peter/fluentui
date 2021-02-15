@@ -1,6 +1,9 @@
 pr: none
 trigger: none
 
+# Example: fluentui_20190626.1
+name: 'fluentui_$(Date:yyyyMMdd)$(Rev:.r)'
+
 schedules:
   # minute 0, hour 12 in UTC (5am in UTC+7), any day of month, any month, days 1-5 of week (M-F)
   # https://docs.microsoft.com/en-us/azure/devops/pipelines/build/triggers?tabs=yaml&view=azure-devops#supported-cron-syntax
@@ -25,8 +28,8 @@ variables:
     value: 0.0.0-nightly
   - name: officialRelease # used by docsite
     value: true
-  - name: nightlyRelease # used by nightly built docsite to setup codesandbox correctly
-    value: true
+  - name: nightlyReleaseDate # used by nightly built docsite to setup codesandbox correctly
+    value: empty
 
   # below are variables configurable at queue time, so they cannot appear in yml file
   # - name: publishDocsiteOnly # set it to true to only run Job_build_publish_doc
@@ -56,7 +59,7 @@ jobs:
         displayName: Authenticate git for pushes
 
       - task: CmdLine@2
-        displayName: Checkout branch
+        displayName: Checkout branch for version pushes
         condition: and(succeeded(), eq(variables.publishOfficial, true))
         inputs:
           script: |
@@ -75,7 +78,7 @@ jobs:
           script: yarn buildci
 
       - task: CmdLine@2
-        displayName: '[Nightly] Pack fluentui packages'
+        displayName: '[Nightly] Pack fluentui packages to ArtifactStagingDirectory'
         condition: and(succeeded(), eq(variables.publishOfficial, false))
         inputs:
           script: |
@@ -93,17 +96,6 @@ jobs:
           storage: fluentsite
           ContainerName: nightly-builds
           BlobPrefix: $(date) # upload tarballs to folder named by today's date
-          Gzip: true
-
-      - task: AzureUpload@2
-        displayName: '[Nightly] Upload tarballs as newest'
-        condition: and(succeeded(), eq(variables.publishOfficial, false))
-        inputs:
-          SourcePath: $(Build.ArtifactStagingDirectory)
-          azureSubscription: 'UI Fabric (private)'
-          storage: fluentsite
-          ContainerName: nightly-builds
-          BlobPrefix: newest # upload tarballs to folder named 'newest'. This folder is used by the nightly version of docsite to create codesandbox
           Gzip: true
 
       - task: CmdLine@2
@@ -145,6 +137,15 @@ jobs:
           filePath: yarn-ci.sh
 
       - task: CmdLine@2
+        displayName: 'Set nightlyReleaseDate'
+        condition: and(succeeded(), eq(variables.publishOfficial, false))
+        inputs:
+          script: |
+            today=`date +%Y-%m-%d`
+            echo date today $today
+            echo "##vso[task.setvariable variable=nightlyReleaseDate]$today"
+
+      - task: CmdLine@2
         displayName: 'Set base path and version'
         condition: and(succeeded(), eq(variables.publishOfficial, true), ne(variables.version, 'canary'))
         inputs:
@@ -153,7 +154,18 @@ jobs:
             echo "Docsite base path published for version $ver"
             echo "##vso[task.setvariable variable=deployBasePath]$ver"
             echo "##vso[task.setvariable variable=docsiteVersion]$ver"
-            echo "##vso[task.setvariable variable=nightlyRelease]"
+            echo "##vso[task.setvariable variable=nightlyReleaseDate]"
+
+      - task: CmdLine@2
+        displayName: 'Set base path and version for canary'
+        condition: and(succeeded(), eq(variables.publishOfficial, true), eq(variables.version, 'canary'))
+        inputs:
+          script: |
+            ver=`node -p "require('./packages/fluentui/lerna.json').version"`
+            echo "Docsite base path published for version $ver"
+            echo "##vso[task.setvariable variable=deployBasePath]$ver"
+            echo "##vso[task.setvariable variable=docsiteVersion]$ver"
+            echo "##vso[task.setvariable variable=nightlyReleaseDate]"
 
       - task: CmdLine@2
         displayName: 'Set base path and version for canary'
@@ -170,7 +182,7 @@ jobs:
         displayName: Build
         inputs:
           script: |
-            echo deployBasePath $(deployBasePath) docsiteVersion $(docsiteVersion) nightlyRelease $(nightlyRelease)
+            echo deployBasePath $(deployBasePath) docsiteVersion $(docsiteVersion) nightlyReleaseDate $(nightlyReleaseDate)
             NODE_ENV=production yarn build:fluentui:docs
 
       - task: PublishPipelineArtifact@1

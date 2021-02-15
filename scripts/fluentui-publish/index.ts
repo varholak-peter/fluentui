@@ -21,7 +21,7 @@ export function fluentuiLernaPublish(bumpType, skipConfirm = false, npmTagForCan
         '--force-publish',
         '--registry',
         'https://registry.npmjs.org',
-        '--no-verify-access', // reason for --no-verify-access: Lerna doesn't work with NPM automation tokens (https://github.com/lerna/lerna/issues/2788)
+        '--no-verify-access', // Lerna doesn't work with NPM automation tokens (https://github.com/lerna/lerna/issues/2788)
         bumpType,
       ];
       break;
@@ -43,7 +43,7 @@ export function fluentuiLernaPublish(bumpType, skipConfirm = false, npmTagForCan
         npmTagForCanary,
         '--preid',
         npmTagForCanary,
-        '--no-verify-access',
+        '--no-verify-access', // Lerna doesn't work with NPM automation tokens (https://github.com/lerna/lerna/issues/2788)
       ];
       break;
     default:
@@ -63,7 +63,7 @@ export function fluentuiLernaPublish(bumpType, skipConfirm = false, npmTagForCan
   });
 
   if (bumpType === 'canary') {
-    // in this case lerna doesn't push change in lerna.json to remote
+    // in canary release lerna doesn't push the version change in lerna.json to remote
     execCommandSync(gitRoot, 'git', ['add', `packages/fluentui/lerna.json`]);
     execCommandSync(gitRoot, 'git', [
       'commit',
@@ -125,21 +125,19 @@ export function packFluentTarballs() {
 
   const replaceDepVersionWithNightlyUrl = packageLocation => {
     const packageJson = require(`${packageLocation}/package.json`);
+    packageJson.version = `0.0.0-nightly+${TODAY}`;
     const dependencies = packageJson.dependencies || {};
-    let hasFluentDependency = false;
+
     for (const depPkg of Object.keys(dependencies)) {
       if (fluentPackagesNames.includes(depPkg)) {
-        hasFluentDependency = true;
         dependencies[depPkg] = `https://fluentsite.blob.core.windows.net/nightly-builds/${TODAY}/${depPkg.replace(
           '@fluentui/',
           'fluentui-',
-        )}-${packageJson.version}.tgz`;
+        )}-0.0.0-nightly.tgz`;
       }
     }
 
-    if (hasFluentDependency) {
-      fs.writeFileSync(path.resolve(packageLocation, 'package.json'), JSON.stringify(packageJson, null, 2));
-    }
+    fs.writeFileSync(path.resolve(packageLocation, 'package.json'), JSON.stringify(packageJson, null, 2));
   };
 
   // pack all fluent public packages into azure pipeline Build.ArtifactStagingDirectory
@@ -148,6 +146,9 @@ export function packFluentTarballs() {
     throw new Error(`Cannot find environment variable BUILD_ARTIFACTSTAGINGDIRECTORY`);
   }
   const tempFolderForPacks = path.resolve(gitRoot, process.env.BUILD_ARTIFACTSTAGINGDIRECTORY);
+  if (!fs.existsSync(tempFolderForPacks)) {
+    throw new Error(`BUILD_ARTIFACTSTAGINGDIRECTORY ${tempFolderForPacks} does not exist`);
+  }
 
   fluentPackages.forEach(fluentPackage => {
     if (!fluentPackage.private) {
