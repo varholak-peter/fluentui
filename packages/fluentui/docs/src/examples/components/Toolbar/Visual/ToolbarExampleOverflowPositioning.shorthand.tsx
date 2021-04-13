@@ -3,7 +3,6 @@ import {
   Provider,
   ShorthandValue,
   Toolbar,
-  ToolbarProps,
   ToolbarItemProps,
   ToolbarItemShorthandKinds,
   ToolbarMenuItemProps,
@@ -55,7 +54,7 @@ const FrameRenderer: React.FC<React.IframeHTMLAttributes<HTMLIFrameElement> & {
   );
 };
 
-const EditorToolbar: React.FC<Pick<ToolbarProps, 'overflowSentinel'>> = ({ overflowSentinel }) => {
+const EditorToolbar: React.FC = () => {
   const [overflowOpen, setOverflowOpen] = React.useState<boolean>(false);
   const overflowIndex = React.useRef<number>();
 
@@ -103,7 +102,6 @@ const EditorToolbar: React.FC<Pick<ToolbarProps, 'overflowSentinel'>> = ({ overf
   return (
     <Flex>
       <Toolbar
-        overflowSentinel={overflowSentinel}
         aria-label="visual test only with editor toolbar"
         styles={{ minWidth: 0, flexGrow: 1 }} // necessary for Toolbar with overflow inside a flex container
         items={_.map(combinedItems, 'toolbarItem')}
@@ -139,7 +137,7 @@ const EditorToolbar: React.FC<Pick<ToolbarProps, 'overflowSentinel'>> = ({ overf
   );
 };
 
-const ToolbarExampleOverflowPositioningShorthand: React.FC<{ dir: 'ltr' | 'rtl' }> = ({ dir }) => (
+const ToolbarExampleOverflowPositioningShorthand: React.FC = () => (
   <FrameRenderer
     frameBorder="0"
     width="400px"
@@ -149,7 +147,6 @@ const ToolbarExampleOverflowPositioningShorthand: React.FC<{ dir: 'ltr' | 'rtl' 
   >
     {externalDocument => (
       <Provider
-        dir={dir}
         styles={{ overflow: 'hidden', height: 'inherit', width: 'inherit' }}
         target={externalDocument}
         theme={teamsTheme}
