@@ -4,7 +4,7 @@ import { gt, lt } from 'semver';
 
 const pkg = require('@fluentui/react-northstar/package.json');
 
-export const FLUENT_NIGHTLY_VERSION = '0.0.0-nightly';
+export const FLUENT_NIGHTLY_VERSION = 'amber-dropdown-fix';
 
 /**
  * A dropdown component that fetches available versions of the docsite from a hosted manifest file and renders available versions
@@ -66,8 +66,8 @@ export function VersionDropdown(props: { width: number }) {
       variables={{ width: `${props.width}px` }}
       items={versions}
       onChange={onChange}
-      // nightly released docsite's package.json is the latest version instead of '0.0.0-nightly'.
-      // The checking here is for version dropdown to display correctly for '0.0.0-nightly'
+      // nightly released docsite's package.json is the latest version instead of 'amber-dropdown-fix'.
+      // The checking here is for version dropdown to display correctly for 'amber-dropdown-fix'
       value={
         window.location.pathname.split('/')[1] === FLUENT_NIGHTLY_VERSION ? FLUENT_NIGHTLY_VERSION : currentVersion
       }

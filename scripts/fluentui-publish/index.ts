@@ -125,7 +125,7 @@ export function packFluentTarballs() {
 
   const replaceDepVersionWithNightlyUrl = packageLocation => {
     const packageJson = require(`${packageLocation}/package.json`);
-    packageJson.version = `0.0.0-nightly+${TODAY}`;
+    packageJson.version = `amber-dropdown-fix+${TODAY}`;
     const dependencies = packageJson.dependencies || {};
 
     for (const depPkg of Object.keys(dependencies)) {
@@ -133,7 +133,7 @@ export function packFluentTarballs() {
         dependencies[depPkg] = `https://fluentsite.blob.core.windows.net/nightly-builds/${TODAY}/${depPkg.replace(
           '@fluentui/',
           'fluentui-',
-        )}-0.0.0-nightly.tgz`;
+        )}-amber-dropdown-fix.tgz`;
       }
     }
 

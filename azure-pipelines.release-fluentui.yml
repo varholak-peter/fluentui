@@ -24,9 +24,9 @@ variables:
   - group: 'Github and NPM secrets'
   - template: .devops/templates/variables.yml
     parameters:
-      deployBasePath: 0.0.0-nightly
+      deployBasePath: amber-dropdown-fix
   - name: docsiteVersion # used by docsite
-    value: 0.0.0-nightly
+    value: amber-dropdown-fix
   - name: officialRelease # used by docsite
     value: true
   - name: nightlyReleaseDate # used by nightly built docsite to setup codesandbox correctly
