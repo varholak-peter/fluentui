@@ -26,6 +26,7 @@ import Downshift, {
   GetInputPropsOptions,
   GetToggleButtonPropsOptions,
   GetItemPropsOptions,
+  ControllerStateAndHelpers,
 } from 'downshift';
 import {
   commonPropTypes,
@@ -812,6 +813,21 @@ export const Dropdown: ComponentWithAs<'div', DropdownProps> &
     }
   };
 
+  const handleInputValueChange = (
+    inputValue: string,
+    stateAndHelpers: ControllerStateAndHelpers<ShorthandValue<DropdownItemProps>>,
+  ) => {
+    const itemSelected = stateAndHelpers.selectedItem && inputValue === itemToString(stateAndHelpers.selectedItem);
+    if (
+      inputValue !== searchQuery &&
+      !itemSelected // when item is selected, `handleStateChange` will update searchQuery.
+    ) {
+      setStateAndInvokeHandler(['onSearchQueryChange'], null, {
+        searchQuery: inputValue,
+      });
+    }
+  };
+
   const handleStateChange = (changes: StateChangeOptions<ShorthandValue<DropdownItemProps>>) => {
     const { type } = changes;
     const newState = {} as DropdownStateForInvoke;
@@ -819,7 +835,7 @@ export const Dropdown: ComponentWithAs<'div', DropdownProps> &
     switch (type) {
       case Downshift.stateChangeTypes.changeInput: {
         const shouldValueChange = changes.inputValue === '' && !multiple && value.length > 0;
-        newState.searchQuery = changes.inputValue;
+
         newState.highlightedIndex = highlightFirstItemOnOpen ? 0 : null;
 
         if (shouldValueChange) {
@@ -865,12 +881,8 @@ export const Dropdown: ComponentWithAs<'div', DropdownProps> &
 
         break;
       case Downshift.stateChangeTypes.keyDownEscape:
-        if (search) {
-          newState.searchQuery = '';
-
-          if (!multiple) {
-            newState.value = [];
-          }
+        if (search && !multiple) {
+          newState.value = [];
         }
         newState.open = false;
         newState.highlightedIndex = highlightFirstItemOnOpen ? 0 : null;
@@ -1537,6 +1549,7 @@ export const Dropdown: ComponentWithAs<'div', DropdownProps> &
         getA11yStatusMessage={getA11yStatusMessage}
         highlightedIndex={highlightedIndex}
         onStateChange={handleStateChange}
+        onInputValueChange={handleInputValueChange}
         labelId={ariaLabelledby}
         environment={context.target?.defaultView}
         inputId={searchInput && searchInput['id'] ? searchInput['id'] : undefined}
