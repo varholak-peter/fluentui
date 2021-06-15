@@ -1,19 +1,21 @@
 import {
   Accessibility,
-  IS_FOCUSABLE_ATTRIBUTE,
   chatMessageBehavior,
-  menuAsToolbarBehavior,
   ChatMessageBehaviorProps,
+  IS_FOCUSABLE_ATTRIBUTE,
+  keyboardKey,
+  menuAsToolbarBehavior,
 } from '@fluentui/accessibility';
 import {
   ComponentWithAs,
   getElementType,
-  useUnhandledProps,
   useAccessibility,
+  useAutoControlled,
+  useContextSelector,
   useFluentContext,
   useStyles,
   useTelemetry,
-  useContextSelector,
+  useUnhandledProps,
 } from '@fluentui/react-bindings';
 import { Ref } from '@fluentui/react-component-ref';
 import * as customPropTypes from '@fluentui/react-proptypes';
@@ -23,6 +25,25 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
 import {
+  ComponentEventHandler,
+  ComponentKeyboardEventHandler,
+  FluentComponentStaticProps,
+  ObjectShorthandValue,
+  ShorthandCollection,
+  ShorthandValue,
+} from '../../types';
+import {
+  ChildrenComponentProps,
+  childrenExist,
+  commonPropTypes,
+  ContentComponentProps,
+  createShorthand,
+  createShorthandFactory,
+  getOrGenerateIdFromShorthand,
+  rtlTextContainer,
+  UIComponentProps,
+} from '../../utils';
+import {
   getScrollParent,
   partitionPopperPropsFromShorthand,
   PopperModifiersFn,
@@ -30,36 +51,29 @@ import {
   PopperShorthandProps,
   usePopper,
 } from '../../utils/positioner';
-import {
-  childrenExist,
-  createShorthandFactory,
-  UIComponentProps,
-  ChildrenComponentProps,
-  ContentComponentProps,
-  commonPropTypes,
-  rtlTextContainer,
-  createShorthand,
-} from '../../utils';
-import { ShorthandValue, ComponentEventHandler, ShorthandCollection, FluentComponentStaticProps } from '../../types';
 import { Box, BoxProps } from '../Box/Box';
+import { Flex } from '../Flex/Flex';
 import { Label, LabelProps } from '../Label/Label';
 import { Menu, MenuProps } from '../Menu/Menu';
 import { MenuItemProps } from '../Menu/MenuItem';
-import { Text, TextProps } from '../Text/Text';
+import { PortalInner } from '../Portal/PortalInner';
 import { Reaction, ReactionProps } from '../Reaction/Reaction';
 import { ReactionGroupProps } from '../Reaction/ReactionGroup';
+import { Text, TextProps } from '../Text/Text';
 import { ChatItemContext } from './chatItemContext';
-import { ChatMessageHeader, ChatMessageHeaderProps } from './ChatMessageHeader';
 import { ChatMessageDetails, ChatMessageDetailsProps } from './ChatMessageDetails';
+import { ChatMessageHeader, ChatMessageHeaderProps } from './ChatMessageHeader';
 import { ChatMessageReadStatus, ChatMessageReadStatusProps } from './ChatMessageReadStatus';
 
 export interface ChatMessageSlotClassNames {
   actionMenu: string;
   author: string;
-  timestamp: string;
   badge: string;
+  bar: string;
+  compactBody: string;
   content: string;
   reactionGroup: string;
+  timestamp: string;
 }
 
 export interface ChatMessageProps
@@ -78,19 +92,25 @@ export interface ChatMessageProps
   /** Author of the message. */
   author?: ShorthandValue<TextProps>;
 
+  /** Controls the message density. Is automatically set by the ChatItem. */
+  compact?: boolean;
+
+  /** A message can have a custom body. Only rendered in compact density. */
+  compactBody?: ShorthandValue<BoxProps>;
+
   /** Indicates whether message belongs to the current user. */
   mine?: boolean;
 
-  /** A message cane have a custom header */
+  /** A message can have a custom header. */
   header?: ShorthandValue<ChatMessageHeaderProps>;
 
   /** Timestamp of the message. */
   timestamp?: ShorthandValue<TextProps>;
 
-  /** Message details info slot for the header. */
+  /** Message details info slot. Displayed in the header or body in comfy and compact density respectively. */
   details?: ShorthandValue<ChatMessageDetailsProps>;
 
-  /** Message read status indicator */
+  /** Message read status indicator. */
   readStatus?: ShorthandValue<ChatMessageReadStatusProps>;
 
   /** Badge attached to the message. */
@@ -134,7 +154,7 @@ export interface ChatMessageProps
 }
 
 export type ChatMessageStylesProps = Pick<ChatMessageProps, 'attached' | 'badgePosition' | 'mine'> & {
-  focused: boolean;
+  compact: boolean;
   hasBadge: boolean;
   hasReactionGroup: boolean;
 };
@@ -143,10 +163,12 @@ export const chatMessageClassName = 'ui-chat__message';
 export const chatMessageSlotClassNames: ChatMessageSlotClassNames = {
   actionMenu: `${chatMessageClassName}__actions`,
   author: `${chatMessageClassName}__author`,
-  timestamp: `${chatMessageClassName}__timestamp`,
   badge: `${chatMessageClassName}__badge`,
+  bar: `${chatMessageClassName}__bar`,
+  compactBody: `${chatMessageClassName}__compact-body`,
   content: `${chatMessageClassName}__content`,
   reactionGroup: `${chatMessageClassName}__reactions`,
+  timestamp: `${chatMessageClassName}__timestamp`,
 };
 
 /**
@@ -159,6 +181,7 @@ export const ChatMessage: ComponentWithAs<'div', ChatMessageProps> &
   setStart();
 
   const parentAttached = useContextSelector(ChatItemContext, v => v.attached);
+  const parentCompact = useContextSelector(ChatItemContext, v => v.compact);
   const {
     accessibility,
     attached = parentAttached,
@@ -167,19 +190,21 @@ export const ChatMessage: ComponentWithAs<'div', ChatMessageProps> &
     badgePosition,
     children,
     className,
+    compact = parentCompact,
+    compactBody,
     content,
     design,
+    details,
+    header,
     mine,
     positionActionMenu,
     reactionGroup,
     reactionGroupPosition,
-    timestamp,
-    styles,
-    variables,
-    header,
-    details,
     readStatus,
+    styles,
+    timestamp,
     unstable_overflow: overflow,
+    variables,
   } = props;
 
   const [actionMenu, positioningProps] = partitionPopperPropsFromShorthand(props.actionMenu);
@@ -242,6 +267,7 @@ export const ChatMessage: ComponentWithAs<'div', ChatMessageProps> &
     mapPropsToStyles: () => ({
       attached,
       badgePosition,
+      compact,
       focused,
       mine,
       hasBadge: !!badge,
@@ -318,7 +344,7 @@ export const ChatMessage: ComponentWithAs<'div', ChatMessageProps> &
 
   const authorElement = Text.create(author, {
     defaultProps: () => ({
-      size: 'small',
+      size: compact ? undefined : 'small',
       styles: resolvedStyles.author,
       className: chatMessageSlotClassNames.author,
     }),
@@ -341,23 +367,77 @@ export const ChatMessage: ComponentWithAs<'div', ChatMessageProps> &
   });
 
   const detailsElement = createShorthand(ChatMessageDetails, details, {
-    defaultProps: () => ({ mine }),
+    defaultProps: () => ({ compact, mine }),
   });
 
-  const readStatusElement = createShorthand(ChatMessageReadStatus, readStatus, {});
-
-  const headerElement = createShorthand(ChatMessageHeader, header || {}, {
-    overrideProps: () => ({
-      content: (
-        <>
-          {authorElement}
-          {timestampElement}
-          {detailsElement}
-          {reactionGroupPosition === 'start' && reactionGroupElement}
-        </>
-      ),
-    }),
+  const readStatusElement = createShorthand(ChatMessageReadStatus, readStatus, {
+    defaultProps: () => ({ compact }),
   });
+
+  let layout = <></>;
+  if (compact) {
+    const headerElement = createShorthand(ChatMessageHeader, header);
+
+    const bodyElement = Box.create(compactBody, {
+      defaultProps: () =>
+        getA11Props('compactBody', {
+          className: chatMessageSlotClassNames.compactBody,
+          styles: resolvedStyles.compactBody,
+        }),
+      overrideProps: () => ({
+        content: (
+          <>
+            <Flex.Item grow={1}>
+              <div>
+                {authorElement}
+                {messageContent}
+              </div>
+            </Flex.Item>
+            {timestampElement}
+            {detailsElement}
+            {badgeElement}
+          </>
+        ),
+      }),
+    });
+
+    layout = (
+      <>
+        {actionMenuElement}
+        <div className={chatMessageSlotClassNames.bar} />
+        {headerElement}
+        {bodyElement}
+        {reactionGroupElement}
+        {readStatusElement}
+      </>
+    );
+  } else {
+    const headerElement = createShorthand(ChatMessageHeader, header || {}, {
+      overrideProps: () => ({
+        content: (
+          <>
+            {authorElement}
+            {timestampElement}
+            {detailsElement}
+            {reactionGroupPosition === 'start' && reactionGroupElement}
+          </>
+        ),
+      }),
+    });
+
+    layout = (
+      <>
+        {actionMenuElement}
+        <div className={chatMessageSlotClassNames.bar} />
+        {badgePosition === 'start' && badgeElement}
+        {headerElement}
+        {messageContent}
+        {reactionGroupPosition === 'end' && reactionGroupElement}
+        {badgePosition === 'end' && badgeElement}
+        {readStatusElement}
+      </>
+    );
+  }
 
   const element = (
     <Ref innerRef={messageRef}>
@@ -372,19 +452,7 @@ export const ChatMessage: ComponentWithAs<'div', ChatMessageProps> &
             ...unhandledProps,
           })}
         >
-          {childrenPropExists ? (
-            children
-          ) : (
-            <>
-              {actionMenuElement}
-              {badgePosition === 'start' && badgeElement}
-              {headerElement}
-              {messageContent}
-              {reactionGroupPosition === 'end' && reactionGroupElement}
-              {badgePosition === 'end' && badgeElement}
-              {readStatusElement}
-            </>
-          )}
+          {childrenPropExists ? children : layout}
         </ElementType>,
       )}
     </Ref>
@@ -399,6 +467,7 @@ ChatMessage.displayName = 'ChatMessage';
 ChatMessage.defaultProps = {
   accessibility: chatMessageBehavior,
   badgePosition: 'end',
+  compactBody: {},
   positionActionMenu: true,
   reactionGroupPosition: 'start',
 };
@@ -409,19 +478,22 @@ ChatMessage.propTypes = {
   attached: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf<'top' | 'bottom'>(['top', 'bottom'])]),
   author: customPropTypes.itemShorthand,
   badge: customPropTypes.itemShorthand,
-  details: customPropTypes.itemShorthand,
   badgePosition: PropTypes.oneOf(['start', 'end']),
+  compact: PropTypes.bool,
+  compactBody: customPropTypes.itemShorthand,
+  details: customPropTypes.itemShorthand,
   header: customPropTypes.itemShorthand,
   mine: PropTypes.bool,
-  timestamp: customPropTypes.itemShorthand,
   onBlur: PropTypes.func,
   onFocus: PropTypes.func,
+  onKeyDown: PropTypes.func,
   onMouseEnter: PropTypes.func,
   positionActionMenu: PropTypes.bool,
   reactionGroup: PropTypes.oneOfType([customPropTypes.collectionShorthand, customPropTypes.itemShorthand]),
   reactionGroupPosition: PropTypes.oneOf(['start', 'end']),
-  unstable_overflow: PropTypes.bool,
   readStatus: customPropTypes.itemShorthand,
+  timestamp: customPropTypes.itemShorthand,
+  unstable_overflow: PropTypes.bool,
 };
 
 ChatMessage.handledProps = Object.keys(ChatMessage.propTypes) as any;
