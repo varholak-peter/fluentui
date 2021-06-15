@@ -3,14 +3,12 @@ import {
   chatMessageBehavior,
   ChatMessageBehaviorProps,
   IS_FOCUSABLE_ATTRIBUTE,
-  keyboardKey,
   menuAsToolbarBehavior,
 } from '@fluentui/accessibility';
 import {
   ComponentWithAs,
   getElementType,
   useAccessibility,
-  useAutoControlled,
   useContextSelector,
   useFluentContext,
   useStyles,
@@ -24,14 +22,7 @@ import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
-import {
-  ComponentEventHandler,
-  ComponentKeyboardEventHandler,
-  FluentComponentStaticProps,
-  ObjectShorthandValue,
-  ShorthandCollection,
-  ShorthandValue,
-} from '../../types';
+import { ComponentEventHandler, FluentComponentStaticProps, ShorthandCollection, ShorthandValue } from '../../types';
 import {
   ChildrenComponentProps,
   childrenExist,
@@ -39,7 +30,6 @@ import {
   ContentComponentProps,
   createShorthand,
   createShorthandFactory,
-  getOrGenerateIdFromShorthand,
   rtlTextContainer,
   UIComponentProps,
 } from '../../utils';
@@ -56,7 +46,6 @@ import { Flex } from '../Flex/Flex';
 import { Label, LabelProps } from '../Label/Label';
 import { Menu, MenuProps } from '../Menu/Menu';
 import { MenuItemProps } from '../Menu/MenuItem';
-import { PortalInner } from '../Portal/PortalInner';
 import { Reaction, ReactionProps } from '../Reaction/Reaction';
 import { ReactionGroupProps } from '../Reaction/ReactionGroup';
 import { Text, TextProps } from '../Text/Text';
@@ -486,7 +475,6 @@ ChatMessage.propTypes = {
   mine: PropTypes.bool,
   onBlur: PropTypes.func,
   onFocus: PropTypes.func,
-  onKeyDown: PropTypes.func,
   onMouseEnter: PropTypes.func,
   positionActionMenu: PropTypes.bool,
   reactionGroup: PropTypes.oneOfType([customPropTypes.collectionShorthand, customPropTypes.itemShorthand]),
