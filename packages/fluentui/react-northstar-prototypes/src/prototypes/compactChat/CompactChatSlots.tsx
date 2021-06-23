@@ -53,7 +53,7 @@ export const CompactChatSlots = () => (
         ChatMessage: {
           root: slotLabelStyles('chat-message-root', { backgroundColor: '#87cefa' }),
           author: slotLabelStyles('author', { backgroundColor: '#e0ffff', zIndex: 1 }),
-          badge: ({ props: { compact } }) =>
+          badge: ({ props }) =>
             slotLabelStyles(
               'badge',
               { overflow: 'visible', ...(props.density === 'comfy' && { position: 'absolute' }) },
