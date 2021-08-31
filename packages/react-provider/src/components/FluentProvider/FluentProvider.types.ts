@@ -28,6 +28,7 @@ export interface FluentProviderState extends FluentProviderProps {
   dir: 'ltr' | 'rtl';
   targetDocument: Document | undefined;
   theme: Theme;
+  themeClassName: string;
 }
 
 export interface FluentProviderContextValues {

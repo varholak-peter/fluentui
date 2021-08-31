@@ -52,6 +52,8 @@ export interface FluentProviderState extends FluentProviderProps {
     targetDocument: Document | undefined;
     // (undocumented)
     theme: Theme;
+    // (undocumented)
+    themeClassName: string;
 }
 
 // @public

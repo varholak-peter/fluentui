@@ -39,7 +39,7 @@ describe('useFluentProviderContextValues', () => {
 
   it('should return a value for "themeClassname"', () => {
     const { result } = renderHook(() => {
-      const state = useFluentProvider({}, React.createRef());
+      const state = useFluentProvider({ className: 'foo' }, React.createRef());
 
       return useFluentProviderContextValues(state);
     });

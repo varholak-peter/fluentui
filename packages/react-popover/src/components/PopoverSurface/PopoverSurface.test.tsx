@@ -1,3 +1,4 @@
+import { resetIdsForTests } from '@fluentui/react-utilities';
 import * as React from 'react';
 import { PopoverSurface } from './PopoverSurface';
 import { render, fireEvent } from '@testing-library/react';
@@ -5,7 +6,6 @@ import { ReactWrapper } from 'enzyme';
 import { isConformant } from '../../common/isConformant';
 import { Portal } from '@fluentui/react-portal';
 import { mockPopoverContext } from '../../common/mockUsePopoverContext';
-import type { PopoverSurfaceProps } from './PopoverSurface.types';
 
 jest.mock('../../popoverContext');
 
@@ -15,7 +15,6 @@ describe('PopoverSurface', () => {
     disabledTests: ['as-renders-html'],
     Component: PopoverSurface,
     displayName: 'PopoverSurface',
-    requiredProps: { open: true } as PopoverSurfaceProps,
     helperComponents: [Portal, 'span'],
   });
 
@@ -29,6 +28,7 @@ describe('PopoverSurface', () => {
   });
 
   beforeEach(() => {
+    resetIdsForTests();
     mockPopoverContext({ open: true });
   });
 

@@ -1,14 +1,6 @@
 import { IsConformantOptions, ConformanceTest } from '@fluentui/react-conformance';
 import './matchers/index';
 
-const mergeClasses = jest.fn();
-
-jest.mock('@fluentui/react-make-styles', () => {
-  const module = jest.requireActual('@fluentui/react-make-styles');
-
-  return { ...module, mergeClasses };
-});
-
 /**
  * Requires a component from a file path, required for proper mocking.
  */
@@ -30,6 +22,13 @@ async function getReactComponent(
  */
 export const classNameWins: ConformanceTest = (componentInfo, testInfo) => {
   let container: HTMLDivElement | null = null;
+  const mergeClasses = jest.fn();
+
+  jest.mock('@fluentui/react-make-styles', () => {
+    const module = jest.requireActual('@fluentui/react-make-styles');
+
+    return { ...module, mergeClasses };
+  });
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -69,5 +68,10 @@ export const classNameWins: ConformanceTest = (componentInfo, testInfo) => {
 
     expect(mergeClasses.mock.calls.length).toBeGreaterThanOrEqual(1);
     expect(mergeClasses.mock.calls).toContainClassNameLastInCalls(className);
+    expect(mergeClasses.mock.calls).toHaveMergeClassesCalledTimesWithClassName(
+      className,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (testInfo.testOptions as any)?.['classname-wins']?.callCount || 1,
+    );
   });
 };

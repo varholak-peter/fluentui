@@ -127,7 +127,7 @@ export const useTextStyles = (state: TextState): TextState => {
     state.align === 'center' && styles.alignCenter,
     state.align === 'end' && styles.alignEnd,
     state.align === 'justify' && styles.alignJustify,
-    state.className,
+    state.className, // overrides
   );
 
   return state;
