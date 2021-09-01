@@ -8,15 +8,16 @@ import { isConformant } from '../../common/isConformant';
 describe('MenuTrigger', () => {
   isConformant({
     disabledTests: [
-      'as-renders-html',
-      'as-renders-fc',
+      // MenuTrigger does not render DOM elements
       'component-handles-ref',
       'component-has-root-ref',
       'component-handles-classname',
-      'as-passes-as-value',
+      // MenuTrigger does not have own styles
+      'classname-wins',
     ],
     Component: MenuTrigger,
     displayName: 'MenuTrigger',
+    skipAsPropTests: true,
     requiredProps: {
       children: <button>MenuTrigger</button>,
     },

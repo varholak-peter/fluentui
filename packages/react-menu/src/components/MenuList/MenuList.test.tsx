@@ -12,7 +12,10 @@ describe('MenuList', () => {
     Component: MenuList,
     displayName: 'MenuList',
     helperComponents: [MenuListProvider],
-    skipAsPropTests: true,
+    disabledTests: [
+      // MenuTrigger does not have own styles
+      'classname-wins',
+    ],
   });
 
   let wrapper: ReactWrapper | undefined;
