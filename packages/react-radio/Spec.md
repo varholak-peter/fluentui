@@ -1,13 +1,16 @@
 # @fluentui/react-radio Spec
 
-The Radio component let people select a single option from two or more choices. Use radio component to present two or more available choices, preferably up to 7 options.
+The Radio component lets people select a single value from two or more options.
+Use the Radio component to represent two or more available choices, preferably up to 7 options.
 
 ## Background
 
-Fabric expects the options to be provided through the `options` prop. The selected value is the key of the option using the `selectedKey`.
-Fabric allows options to have image instead of a label.
+In Fabric the Radio component is represented by the [ChoiceGroup](https://developer.microsoft.com/en-us/fluentui#/controls/web/choicegroup) component.
+Fabric creates options based on data passed in via the `options` prop.
+It uses the option's `key` property as the input value and holds the currently selected value in the `selectedKey` prop.
+Fabric also allows an image to serve as a label for an option.
 
-```jsx
+```tsx
 <ChoiceGroup
   defaultSelectedKey="B"
   options={[
@@ -21,9 +24,11 @@ Fabric allows options to have image instead of a label.
 />
 ```
 
-Northstar's implementation consists of `RadioGroup` that includes two or more `RadioItems`, which are given thorugh the `items` prop.
+In Northstar the Radio component is represented by the [RadioGroup](https://fluentsite.z22.web.core.windows.net/components/radio-group/definition) component.
+Northstar creates options based on data passed in via the `items` prop.
+It uses the option's `value` property as the input value and holds the currently selected value in the `checkedValue` prop.
 
-```jsx
+```tsx
 <RadioGroup
   onCheckedValueChange={handleChange}
   items={[
@@ -38,18 +43,18 @@ Northstar's implementation consists of `RadioGroup` that includes two or more `R
 - [OpenUI research](https://open-ui.org/components/radio-button.research)
 - [Epic](https://github.com/microsoft/fluentui/issues/19953)
 
-### Comparison of [Fabric ChoiceGroup](https://developer.microsoft.com/en-us/fluentui#/controls/web/choicegroup) and [Stardust RadioGroup](https://fluentsite.z22.web.core.windows.net/0.54.0/components/radio-group/definition)
+### Comparison of [Fabric ChoiceGroup](https://developer.microsoft.com/en-us/fluentui#/controls/web/choicegroup) and [Stardust RadioGroup](https://fluentsite.z22.web.core.windows.net/components/radio-group/definition)
 
 - All mentions of v7 or v8 refer to Fabric - `@fluentui/react` ([docsite](https://developer.microsoft.com/en-us/fluentui#/))
 - All mentions of v0 refer to Northstar - `@fluentui/react-northstar` ([docsite](https://fluentsite.z22.web.core.windows.net/))
 
-_⚠️Props not included in this section are marked as depricated and will not be considered._
+_⚠️ Props not included in this section are marked as deprecated and will not be considered._
 
 _Include background research done for this component_
 
-- _Link to Open UI research_ ✔️
-- _Link to comparison of v7 and v0_
-- _Link to GitHub epic issue for the converged component_ ✔️
+- [x] _Link to Open UI research_
+- [ ] _Link to comparison of v7 and v0_
+- [x] _Link to GitHub epic issue for the converged component_
 
 ## Variants
 
@@ -86,68 +91,50 @@ _List the **Props** and **Slots** proposed for the component. Ideally this would
 
 ### Components
 
-| Component | Purpose                                                                           |
-| --------- | --------------------------------------------------------------------------------- |
-| Radio     | Is a wrapper to the items                                                         |
-| RadioItem | Represents a single item which is potentially to be used with the Field component |
+| Component | Purpose                                             |
+| --------- | --------------------------------------------------- |
+| Radio     | Wraps radio inputs. Provides API for control group. |
+| RadioItem | Represents a single radio input.                    |
 
 ### Radio
 
-| Prop                | Type                    | Purpose |
-| ------------------- | ----------------------- | ------- |
-| groupLabel (legend) | -                       | -       |
-| defaultSelected     | -                       | -       |
-| selectedValue       | -                       | -       |
-| orientation         | "horizonal", "vertical" | -       |
+| Prop           | Type                         | Purpose                                                                          |
+| -------------- | ---------------------------- | -------------------------------------------------------------------------------- |
+| defaultValue   | `string`                     | Which option should be preselected by default. (default: undefined)              |
+| label (legend) | `string \| (slot)`           | Label for the group of radio controls.                                           |
+| name           | `string`                     | Name property passed to child inputs.                                            |
+| orientation    | `"horizontal" \| "vertical"` | Specifies how the layout in which the controls are rendered. (default: vertical) |
+| value          | `string`                     | Currently selected value. Used only for controlled mode.                         |
 
 ### RadioItem
 
-| Prop                              | Type | Purpose |
-| --------------------------------- | ---- | ------- |
-| key (root)                        | -    | -       |
-| id (input - id & label - htmlfor) | -    | -       |
-| text (label)                      | -    | -       |
-| name (input)                      | -    | -       |
-| checked (input)                   | -    | -       |
-| disabled (input)                  | -    | -       |
+| Prop                              | Type               | Purpose                                                  |
+| --------------------------------- | ------------------ | -------------------------------------------------------- |
+| key (root)                        | `string`           | React `key` prop.                                        |
+| id (input - id & label - htmlfor) | `string`           | ID passed to input. Also used for input + label pairing. |
+| label (label)                     | `string \| (slot)` | Label that will be rendered next to the radio input.     |
+| checked (input)                   | `boolean`          | Whether the input is checked or not.                     |
+| disabled (input)                  | `boolean`          | Whether the input is disabled or not.                    |
 
 ### Sample Code
 
-`Radio` component:
-
-```jsx
-//Options as a prop
-const items = [
-  {text: 'chocolate', key: 'optio1'},
-  {text: 'strawberry', key:'option2'},
-  {text: 'mango', key:'option3'}
-]
-
-<Radio items={items} name="pref" label="Choose your preference?" />
-```
-
-```jsx
-//Options as a prop
-const items = [
-  {text: 'chocolate', key: 'optio1'},
-  {text: 'strawberry', key:'option2'},
-  {text: 'mango', key:'option3'}
-]
-
-<Radio name="pref" label="Choose your preference?">
-  {items.map(
-    ({ key, text }) => <RadioItem key={key}>{text}</RadioItem>
-  )}
-</Radio>
-```
-
 ```tsx
-// Radio Items as children?  ---> maybe not possible
+const iceCreams = [
+  'Chocolate',
+  'Strawberry',
+  'Mango',
+]
 
-<Radio label="Choose your preference?" name="pref">
-  <RadioItem key="option1"> chocolate </RadioItem>
-  <RadioItem key="option2"> strawberry </RadioItem>
-  <RadioItem key="option3"> mango </RadioItem>
+<Radio label="Which ice cream would you like?" name="ice-cream">
+  {iceCreams.map(
+    iceCream => (
+      <RadioItem
+        key={iceCream}
+        id={`ic-${iceCream}`}
+        label={iceCream}
+      />
+    )
+  )}
 </Radio>
 ```
 
@@ -161,16 +148,19 @@ const items = [
 
 ```html
 <fieldset>
-  <legend>What is your preference?</legend>
-
-  <input type="radio" id="option1" name="pref" />
-  <label for="option1"> Chocolate </label>
-
-  <input type="radio" id="option2" name="pref" />
-  <label for="option1"> Strawberry </label>
-
-  <input type="radio" id="option3" name="pref" />
-  <label for="option1"> Mango </label>
+  <legend>Which ice cream would you like?</legend>
+  <span>
+    <input id="ic-Chocolate" name="ice-cream" type="radio" />
+    <label for="ic-Chocolate">Chocolate</label>
+  </span>
+  <span>
+    <input id="ic-Strawberry" name="ice-cream" type="radio" />
+    <label for="ic-Strawberry">Strawberry</label>
+  </span>
+  <span>
+    <input id="ic-Mango" name="ice-cream" type="radio" />
+    <label for="ic-Mango">Mango</label>
+  </span>
 </fieldset>
 ```
 
