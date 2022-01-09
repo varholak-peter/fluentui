@@ -5,3 +5,4 @@ export * from './DialogBody';
 export * from './DialogContent';
 export * from './DialogFooter';
 export * from './DialogHeader';
+export * from './DialogOverlay';
