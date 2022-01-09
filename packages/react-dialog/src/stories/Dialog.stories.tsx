@@ -9,8 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogOverlay,
-  DialogTrigger,
-  useDialog,
+  useDialogInstance,
 } from '../index';
 
 import descriptionMd from './DialogDescription.md';
@@ -28,113 +27,166 @@ export default {
   },
 };
 
-export const Default = () => (
-  <Dialog>
-    <DialogTrigger>
-      <Button appearance="primary">Open Dialog</Button>
-    </DialogTrigger>
-    <DialogOverlay />
-    <DialogContent>
-      <DialogHeader>Dialog title</DialogHeader>
-      <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
-      <DialogFooter>
-        <Button appearance="outline">Cancel</Button>
-        <Button appearance="primary">No?</Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-);
+export const Default = () => {
+  const dialogToolkit = useDialogInstance();
 
-export const NonModal = () => (
-  <Dialog>
-    <DialogTrigger>
-      <Button appearance="primary">Open Dialog</Button>
-    </DialogTrigger>
-    <DialogContent>
-      <DialogHeader>Dialog title</DialogHeader>
-      <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
-      <DialogFooter>
-        <Button appearance="primary">No?</Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-);
-
-export const Controlled = () => {
-  const dialogToolkit = useDialog();
   return (
-    <Dialog {...dialogToolkit}>
-      <DialogTrigger>
-        <Button appearance="primary">{dialogToolkit.isOpen ? 'Close' : 'Open'} Dialog</Button>
-      </DialogTrigger>
-      <DialogOverlay />
-      <DialogContent>
-        <DialogHeader>Dialog title</DialogHeader>
-        <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
-        <DialogFooter>
-          <Button appearance="outline">Cancel</Button>
-          <Button
-            appearance="primary"
-            onClick={() => {
-              console.log('doing something before dialog closes');
-              dialogToolkit.close();
-              console.log('doing something before after closes');
-            }}
-          >
-            No?
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        Open Dialog
+      </Button>
+      {/* Some other components if desired. */}
+      <Dialog {...dialogToolkit}>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>Dialog title</DialogHeader>
+          <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
+          <DialogFooter>
+            <Button
+              appearance="outline"
+              onClick={() => {
+                dialogToolkit.close();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                console.log("I thought not. It's not a story the Jedi would tell you.");
+                dialogToolkit.close();
+              }}
+            >
+              No?
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
-export const FocusTrap = () => (
-  <>
-    <Dialog>
-      <DialogTrigger>
-        <Button appearance="primary">Open Dialog</Button>
-      </DialogTrigger>
-      <DialogOverlay />
-      <DialogContent>
-        <DialogHeader>Dialog title</DialogHeader>
-        <DialogBody>
-          <div>
-            <label htmlFor="firstName">First Name</label>
-            <input type="text" id="firstName" placeholder="John" />
+export const NonModal = () => {
+  const dialogToolkit = useDialogInstance({ isModal: false });
 
-            <label htmlFor="lastName">Last Name</label>
-            <input type="text" id="lastName" placeholder="Doe" />
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <Button appearance="primary">Send</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <p>These elements can't be focused when the dialog is opened.</p>
-    <button type="button">A button</button>
-    <input type="text" placeholder="Another focusable element" />
-  </>
-);
-
-export const CustomFocus = () => {
-  const dialogToolkit = useDialog();
-  const lastNameRef = React.useRef<HTMLInputElement>(null);
-  const searchFieldRef = React.useRef<HTMLInputElement>(null);
   return (
     <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        Open Dialog
+      </Button>
+      {/* Some other components if desired. */}
+      <Dialog {...dialogToolkit}>
+        <DialogContent>
+          <DialogHeader>Dialog title</DialogHeader>
+          <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
+          <DialogFooter>
+            <Button
+              appearance="outline"
+              onClick={() => {
+                dialogToolkit.close();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                console.log("I thought not. It's not a story the Jedi would tell you.");
+                dialogToolkit.close();
+              }}
+            >
+              No?
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+export const FocusTrap = () => {
+  const dialogToolkit = useDialogInstance();
+
+  return (
+    <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        Open Dialog
+      </Button>
+
+      <p>These elements can't be focused when the dialog is opened.</p>
+      <button type="button">A button</button>
+      <input type="text" placeholder="Another focusable element" />
+
+      <Dialog {...dialogToolkit}>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>Dialog title</DialogHeader>
+          <DialogBody>
+            <div>
+              <label htmlFor="firstName">First Name</label>
+              <input type="text" id="firstName" placeholder="John" />
+
+              <label htmlFor="lastName">Last Name</label>
+              <input type="text" id="lastName" placeholder="Doe" />
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                console.log('Doing some form processing magic.');
+                dialogToolkit.close();
+              }}
+            >
+              Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+export const CustomFocus = () => {
+  const dialogToolkit = useDialogInstance({ shouldAutoFocus: false });
+  const lastNameRef = React.useRef<HTMLInputElement>(null);
+  const searchFieldRef = React.useRef<HTMLInputElement>(null);
+
+  return (
+    <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        Open Dialog
+      </Button>
+
+      <p>The search input will receive the focus after closing the dialog.</p>
+      <input type="text" placeholder="Search…" ref={searchFieldRef} />
+
       <Dialog
         {...dialogToolkit}
-        disableAutoFocus
         onClose={() => {
           searchFieldRef.current?.focus();
         }}
       >
-        <DialogTrigger>
-          <Button appearance="primary">Open Dialog</Button>
-        </DialogTrigger>
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>Dialog title</DialogHeader>
@@ -149,69 +201,104 @@ export const CustomFocus = () => {
             </div>
           </DialogBody>
           <DialogFooter>
-            <Button appearance="primary">Send</Button>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                console.log('Doing some form processing magic.');
+                dialogToolkit.close();
+              }}
+            >
+              Send
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <p>The search input will receive the focus after closing the dialog.</p>
-      <input type="text" placeholder="Search…" ref={searchFieldRef} />
     </>
   );
 };
 
 export const NoEscapeDismiss = () => {
-  const dialogToolkit = useDialog();
+  const dialogToolkit = useDialogInstance();
+
   return (
-    <Dialog
-      {...dialogToolkit}
-      onBeforeClose={({ cancelClose, source }) => {
-        if (source === 'escape') {
-          cancelClose();
-        }
-      }}
-    >
-      <DialogTrigger>
-        <Button appearance="primary">Open Dialog</Button>
-      </DialogTrigger>
-      <DialogOverlay />
-      <DialogContent>
-        <DialogHeader>Dialog title</DialogHeader>
-        <DialogBody>
-          You cannot close me with <kbd>Esc</kbd>. ¯\_(ツ)_/¯
-        </DialogBody>
-        <DialogFooter>
-          <Button appearance="primary">Send</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        Open Dialog
+      </Button>
+      {/* Some other components if desired. */}
+      <Dialog
+        {...dialogToolkit}
+        onBeforeClose={({ cancelClose, source }) => {
+          if (source === 'escape') {
+            cancelClose();
+          }
+        }}
+      >
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>Dialog title</DialogHeader>
+          <DialogBody>
+            You cannot close me with <kbd>Esc</kbd>. ¯\_(ツ)_/¯
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              appearance="outline"
+              onClick={() => {
+                dialogToolkit.close();
+              }}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
 export const NoPointerDownOverlayDismiss = () => {
-  const dialogToolkit = useDialog();
+  const dialogToolkit = useDialogInstance();
+
   return (
-    <Dialog
-      {...dialogToolkit}
-      onBeforeClose={({ cancelClose, source }) => {
-        if (source === 'overlay') {
-          cancelClose();
-        }
-      }}
-    >
-      <DialogTrigger>
-        <Button appearance="primary">Open Dialog</Button>
-      </DialogTrigger>
-      <DialogOverlay />
-      <DialogContent>
-        <DialogHeader>Dialog title</DialogHeader>
-        <DialogBody>
-          You cannot close me with <kbd>Esc</kbd>. ¯\_(ツ)_/¯
-        </DialogBody>
-        <DialogFooter>
-          <Button appearance="primary">Send</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        Open Dialog
+      </Button>
+      {/* Some other components if desired. */}
+      <Dialog
+        {...dialogToolkit}
+        onBeforeClose={({ cancelClose, source }) => {
+          if (source === 'overlay') {
+            cancelClose();
+          }
+        }}
+      >
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>Dialog title</DialogHeader>
+          <DialogBody>You cannot close me by clicking outside the Dialog. ¯\_(ツ)_/¯</DialogBody>
+          <DialogFooter>
+            <Button
+              appearance="outline"
+              onClick={() => {
+                dialogToolkit.close();
+              }}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
