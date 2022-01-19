@@ -6,7 +6,9 @@ export type DialogSlots = {
 };
 
 export type DialogCommons = {
-  // TODO Add things shared between props and state here
+  isModal: boolean;
+  isOpen: boolean;
+  shouldAutoFocus: boolean;
 };
 
 /**

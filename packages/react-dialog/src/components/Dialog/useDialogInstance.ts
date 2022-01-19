@@ -1,10 +1,7 @@
 import * as React from 'react';
+import { DialogProps } from './Dialog.types';
 
-type UseDialogInstanceOptions = {
-  isModal: boolean;
-  isOpen: boolean;
-  shouldAutoFocus: boolean;
-};
+type UseDialogInstanceOptions = Pick<DialogProps, 'isModal' | 'isOpen' | 'shouldAutoFocus'>;
 
 const defaultOptions = {
   isModal: true,
@@ -27,7 +24,9 @@ export const useDialogInstance = (options?: Partial<UseDialogInstanceOptions>) =
 
   return {
     close,
+    isModal: fullOptions.isModal,
     isOpen,
     open,
+    shouldAutoFocus: fullOptions.shouldAutoFocus,
   };
 };

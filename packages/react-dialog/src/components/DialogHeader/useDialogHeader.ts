@@ -23,8 +23,7 @@ export const useDialogHeader = (props: DialogHeaderProps, ref: React.Ref<HTMLEle
   return {
     // TODO add appropriate props/defaults
     components: {
-      // TODO add slot types here if needed (div is the default)
-      root: 'div',
+      root: 'header',
     },
     // TODO add appropriate slots, for example:
     // mySlot: resolveShorthand(props.mySlot),

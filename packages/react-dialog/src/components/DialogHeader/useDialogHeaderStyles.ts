@@ -6,10 +6,20 @@ import type { DialogHeaderState } from './DialogHeader.types';
  */
 const useStyles = makeStyles({
   root: theme => ({
-    // TODO Add default styles for the root element
-  }),
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start', // TODO: close icon exception
+    paddingBottom: '8px',
+    width: '100%',
 
-  // TODO add additional classes for different states and/or slots
+    // TODO: This is temp.
+    '& > h1': {
+      margin: 0,
+      fontSize: theme.fontSizeBase500,
+      fontWeight: theme.fontWeightMedium,
+    },
+  }),
 });
 
 /**

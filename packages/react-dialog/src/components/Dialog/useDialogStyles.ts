@@ -8,10 +8,8 @@ export const dialogClassName = 'fui-Dialog';
  */
 const useStyles = makeStyles({
   root: theme => ({
-    // TODO Add default styles for the root element
+    pointerEvents: 'none',
   }),
-
-  // TODO add additional classes for different states and/or slots
 });
 
 /**

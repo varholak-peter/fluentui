@@ -6,10 +6,17 @@ import type { DialogOverlayState } from './DialogOverlay.types';
  */
 const useStyles = makeStyles({
   root: theme => ({
-    // TODO Add default styles for the root element
+    backgroundColor: 'pink', // @varholak-peter #refactor This is temp only
+    height: '100vh',
+    left: 0,
+    maxHeight: '100vh',
+    maxWidth: '100vw',
+    overflow: 'hidden',
+    position: 'fixed',
+    top: 0,
+    width: '100vw',
+    zIndex: 500, // @varholak-peter #refactor This is temp only
   }),
-
-  // TODO add additional classes for different states and/or slots
 });
 
 /**

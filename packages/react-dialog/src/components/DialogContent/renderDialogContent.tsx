@@ -10,5 +10,5 @@ export const renderDialogContent = (state: DialogContentState) => {
   const { slots, slotProps } = getSlots<DialogContentSlots>(state, dialogContentShorthandProps);
 
   // TODO Add additional slots in the appropriate place
-  return <slots.root {...slotProps.root} />;
+  return <slots.root aria-modal={true} role="dialog" {...slotProps.root} />;
 };

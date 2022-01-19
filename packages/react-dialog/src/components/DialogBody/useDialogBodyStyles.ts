@@ -6,10 +6,8 @@ import type { DialogBodyState } from './DialogBody.types';
  */
 const useStyles = makeStyles({
   root: theme => ({
-    // TODO Add default styles for the root element
+    paddingBottom: '8px',
   }),
-
-  // TODO add additional classes for different states and/or slots
 });
 
 /**

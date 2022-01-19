@@ -22,6 +22,9 @@ export const dialogShorthandProps: (keyof DialogSlots)[] = [
 export const useDialog = (props: DialogProps, ref: React.Ref<HTMLElement>): DialogState => {
   return {
     // TODO add appropriate props/defaults
+    isModal: props.isModal,
+    isOpen: props.isOpen,
+    shouldAutoFocus: props.shouldAutoFocus,
     components: {
       // TODO add slot types here if needed (div is the default)
       root: 'div',

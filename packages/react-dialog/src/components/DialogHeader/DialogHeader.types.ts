@@ -2,7 +2,7 @@ import type { ComponentProps, ComponentState, IntrinsicShorthandProps } from '@f
 
 export type DialogHeaderSlots = {
   // TODO Add slots here and to dialogHeaderShorthandProps in useDialogHeader.ts
-  root: IntrinsicShorthandProps<'div'>;
+  root: IntrinsicShorthandProps<'header'>;
 };
 
 export type DialogHeaderCommons = {

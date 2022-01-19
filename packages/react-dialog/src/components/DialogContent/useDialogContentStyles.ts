@@ -6,10 +6,23 @@ import type { DialogContentState } from './DialogContent.types';
  */
 const useStyles = makeStyles({
   root: theme => ({
-    // TODO Add default styles for the root element
+    backgroundColor: theme.colorNeutralBackground1,
+    borderRadius: '8px',
+    boxShadow: theme.shadow64,
+    display: 'flex',
+    flexDirection: 'column',
+    left: '50%',
+    margin: 'auto',
+    maxHeight: '100vh',
+    maxWidth: '600px',
+    padding: '32px',
+    pointerEvents: 'auto',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '100%',
+    zIndex: 505, // @varholak-peter #refactor This is temp only
   }),
-
-  // TODO add additional classes for different states and/or slots
 });
 
 /**

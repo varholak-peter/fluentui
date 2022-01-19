@@ -6,10 +6,16 @@ import type { DialogFooterState } from './DialogFooter.types';
  */
 const useStyles = makeStyles({
   root: theme => ({
-    // TODO Add default styles for the root element
-  }),
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: '100%',
 
-  // TODO add additional classes for different states and/or slots
+    '& > *:not(:last-child)': {
+      marginRight: '8px',
+    },
+  }),
 });
 
 /**
