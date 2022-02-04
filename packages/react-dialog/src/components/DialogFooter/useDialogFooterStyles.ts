@@ -12,8 +12,23 @@ const useStyles = makeStyles({
     justifyContent: 'flex-end',
     width: '100%',
 
-    '& > *:not(:last-child)': {
+    '& > .fui-Button:not(:last-child)': {
       marginRight: '8px',
+    },
+
+    '@media screen and (max-width: 620px)': {
+      alignItems: 'stretch',
+      flexDirection: 'column',
+
+      '& > .fui-Button': {
+        margin: 0,
+        maxWidth: 'none',
+
+        '&:not(:last-child)': {
+          marginBottom: '8px',
+          marginRight: 0,
+        },
+      },
     },
   }),
 });

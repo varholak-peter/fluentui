@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { getNativeElementProps } from '@fluentui/react-utilities';
+import { useModalAttributes, useFocusFinders } from '@fluentui/react-tabster';
+import { getNativeElementProps, useMergedRefs } from '@fluentui/react-utilities';
 import type { DialogContentProps, DialogContentSlots, DialogContentState } from './DialogContent.types';
 
 /**
@@ -20,6 +21,17 @@ export const dialogContentShorthandProps: (keyof DialogContentSlots)[] = [
  * @param ref - reference to root HTMLElement of DialogContent
  */
 export const useDialogContent = (props: DialogContentProps, ref: React.Ref<HTMLElement>): DialogContentState => {
+  const contentRef = React.useRef();
+  const { modalAttributes } = useModalAttributes({ trapFocus: true });
+  const { findFirstFocusable } = useFocusFinders();
+
+  React.useEffect(() => {
+    if (contentRef.current) {
+      const firstFocusable = findFirstFocusable(contentRef.current);
+      firstFocusable?.focus();
+    }
+  }, [contentRef, findFirstFocusable]);
+
   return {
     // TODO add appropriate props/defaults
     components: {
@@ -29,7 +41,10 @@ export const useDialogContent = (props: DialogContentProps, ref: React.Ref<HTMLE
     // TODO add appropriate slots, for example:
     // mySlot: resolveShorthand(props.mySlot),
     root: getNativeElementProps('div', {
-      ref,
+      ref: useMergedRefs(ref, contentRef),
+      // 'aria-label': 'todo',
+      role: 'dialog',
+      ...modalAttributes,
       ...props,
     }),
   };

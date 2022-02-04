@@ -6,8 +6,9 @@ export type DialogSlots = {
 };
 
 export type DialogCommons = {
-  isModal: boolean;
   isOpen: boolean;
+  onClose?: Function;
+  onOpen?: Function;
   shouldAutoFocus: boolean;
 };
 

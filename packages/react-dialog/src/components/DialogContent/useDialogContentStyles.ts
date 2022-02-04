@@ -9,6 +9,7 @@ const useStyles = makeStyles({
     backgroundColor: theme.colorNeutralBackground1,
     borderRadius: '8px',
     boxShadow: theme.shadow64,
+    boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
     left: '50%',
@@ -22,6 +23,10 @@ const useStyles = makeStyles({
     transform: 'translate(-50%, -50%)',
     width: '100%',
     zIndex: 505, // @varholak-peter #refactor This is temp only
+
+    '@media screen and (max-width: 620px)': {
+      padding: '16px',
+    },
   }),
 });
 

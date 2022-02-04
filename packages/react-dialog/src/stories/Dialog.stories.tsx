@@ -42,7 +42,12 @@ export const Default = () => {
       </Button>
       {/* Some other components if desired. */}
       <Dialog {...dialogToolkit}>
-        <DialogOverlay />
+        <DialogOverlay
+          onClick={() => {
+            console.log('Closing dialog by clicking overlay.');
+            dialogToolkit.close();
+          }}
+        />
         <DialogContent>
           <DialogHeader>Dialog title</DialogHeader>
           <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
@@ -72,7 +77,7 @@ export const Default = () => {
 };
 
 export const NonModal = () => {
-  const dialogToolkit = useDialogInstance({ isModal: false });
+  const dialogToolkit = useDialogInstance();
 
   return (
     <>
@@ -133,7 +138,12 @@ export const FocusTrap = () => {
       <input type="text" placeholder="Another focusable element" />
 
       <Dialog {...dialogToolkit}>
-        <DialogOverlay />
+        <DialogOverlay
+          onClick={() => {
+            console.log('Closing dialog by clicking overlay.');
+            dialogToolkit.close();
+          }}
+        />
         <DialogContent>
           <DialogHeader>Dialog title</DialogHeader>
           <DialogBody>
@@ -163,7 +173,15 @@ export const FocusTrap = () => {
 };
 
 export const CustomFocus = () => {
-  const dialogToolkit = useDialogInstance({ shouldAutoFocus: false });
+  const dialogToolkit = useDialogInstance({
+    onClose: () => {
+      searchFieldRef.current?.focus();
+    },
+    onOpen: () => {
+      lastNameRef.current?.focus();
+    },
+    shouldAutoFocus: false,
+  });
   const lastNameRef = React.useRef<HTMLInputElement>(null);
   const searchFieldRef = React.useRef<HTMLInputElement>(null);
 
@@ -181,13 +199,13 @@ export const CustomFocus = () => {
       <p>The search input will receive the focus after closing the dialog.</p>
       <input type="text" placeholder="Search…" ref={searchFieldRef} />
 
-      <Dialog
-        {...dialogToolkit}
-        onClose={() => {
-          searchFieldRef.current?.focus();
-        }}
-      >
-        <DialogOverlay />
+      <Dialog {...dialogToolkit}>
+        <DialogOverlay
+          onClick={() => {
+            console.log('Closing dialog by clicking overlay.');
+            dialogToolkit.close();
+          }}
+        />
         <DialogContent>
           <DialogHeader>Dialog title</DialogHeader>
           <DialogBody>
@@ -231,14 +249,7 @@ export const NoEscapeDismiss = () => {
         Open Dialog
       </Button>
       {/* Some other components if desired. */}
-      <Dialog
-        {...dialogToolkit}
-        onBeforeClose={({ cancelClose, source }) => {
-          if (source === 'escape') {
-            cancelClose();
-          }
-        }}
-      >
+      <Dialog {...dialogToolkit}>
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>Dialog title</DialogHeader>
@@ -275,14 +286,7 @@ export const NoPointerDownOverlayDismiss = () => {
         Open Dialog
       </Button>
       {/* Some other components if desired. */}
-      <Dialog
-        {...dialogToolkit}
-        onBeforeClose={({ cancelClose, source }) => {
-          if (source === 'overlay') {
-            cancelClose();
-          }
-        }}
-      >
+      <Dialog {...dialogToolkit}>
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>Dialog title</DialogHeader>
