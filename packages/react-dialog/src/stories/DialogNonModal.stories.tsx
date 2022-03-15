@@ -16,7 +16,15 @@ export const DialogNonModal = (props: Partial<DialogProps>) => {
         Open Dialog
       </Button>
 
-      <Dialog type="non-modal" aria-labelledby="dialog-title" open={isOpen} {...props}>
+      <Dialog
+        type="non-modal"
+        aria-labelledby="dialog-title"
+        open={isOpen}
+        onOpenChange={({ open }) => {
+          setIsOpen(open);
+        }}
+        {...props}
+      >
         <DialogHeader id="dialog-title">Dialog title</DialogHeader>
         <DialogBody>Do you want to send this message without a subject?</DialogBody>
         <DialogFooter>

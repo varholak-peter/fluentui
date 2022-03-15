@@ -5,7 +5,17 @@ export type DialogSlots = {
   overlay?: Slot<'div'>;
 };
 
+type OnOpenChangeData = {
+  open: boolean;
+  source: 'Escape';
+};
+
 type DialogCommons = {
+  /**
+   * Event handler for Dialog triggered open/closed events.
+   */
+  onOpenChange?: (data: OnOpenChangeData) => void;
+
   /**
    * Whether the dialog is open or closed.
    * @defaultvalue undefined

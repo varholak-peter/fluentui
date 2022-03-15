@@ -13,12 +13,24 @@ import { useModalAttributes, useFocusFinders } from '@fluentui/react-tabster';
  * @param ref - reference to root HTMLElement of Dialog
  */
 export const useDialog_unstable = (props: DialogProps, ref: React.Ref<HTMLElement>): DialogState => {
-  const { overlay, open = false, type = 'modal' } = props;
+  const { overlay, onOpenChange, open = false, type = 'modal' } = props;
   const isNonModal = type === 'non-modal';
 
   const contentRef = React.useRef(null);
   const { modalAttributes } = useModalAttributes({ trapFocus: !isNonModal && true });
   const { findFirstFocusable } = useFocusFinders();
+
+  const handleKeydown = React.useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onOpenChange?.({
+          open: false,
+          source: 'Escape',
+        });
+      }
+    },
+    [onOpenChange],
+  );
 
   React.useEffect(() => {
     if (open && contentRef.current) {
@@ -26,6 +38,14 @@ export const useDialog_unstable = (props: DialogProps, ref: React.Ref<HTMLElemen
       firstFocusable?.focus();
     }
   }, [open, contentRef, findFirstFocusable]);
+
+  React.useEffect(() => {
+    document.addEventListener('keydown', handleKeydown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeydown);
+    };
+  });
 
   const state: DialogState = {
     open,
